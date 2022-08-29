@@ -11,4 +11,9 @@ public class SubManagerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SubManagerApplication.class, args);
 	}
+
+	@Bean
+	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }
