@@ -1,7 +1,7 @@
 package io.submanager.controller;
 
-import io.submanager.model.entity.LogInRequest;
-import io.submanager.model.entity.LogInResponse;
+import io.submanager.model.LogInRequest;
+import io.submanager.model.LogInResponse;
 import io.submanager.model.entity.User;
 import io.submanager.service.CustomUserDetailsService;
 import io.submanager.service.JwtService;
@@ -42,7 +42,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<LogInResponse> logIn(@RequestBody LogInRequest logInRequest) {
+    public ResponseEntity<LogInResponse> logIn(@Valid @RequestBody LogInRequest logInRequest) {
         authenticate(logInRequest.getEmail(), logInRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(logInRequest.getEmail());
         String token = jwtService.generateToken(userDetails);

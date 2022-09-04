@@ -1,4 +1,4 @@
-package io.submanager.model.entity;
+package io.submanager.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
