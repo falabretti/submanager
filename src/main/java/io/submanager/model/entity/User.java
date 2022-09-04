@@ -32,6 +32,7 @@ public class User {
     @NotBlank(message = "email must not be blank")
     private String email;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
     @Column(name = "password")
     @NotBlank(message = "password must not be blank")
     private String password;

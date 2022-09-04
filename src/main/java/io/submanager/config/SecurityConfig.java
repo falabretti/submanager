@@ -3,7 +3,6 @@ package io.submanager.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -45,8 +44,8 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        httpSecurity.authorizeRequests().antMatchers(HttpMethod.GET, "/test/public").permitAll();
-        httpSecurity.authorizeRequests().antMatchers(HttpMethod.POST, "/user", "/auth/login").permitAll();
+        httpSecurity.authorizeRequests().antMatchers("/test/public").permitAll();
+        httpSecurity.authorizeRequests().antMatchers("/auth/**").permitAll();
         httpSecurity.authorizeRequests().anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -28,18 +28,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        doFilterInternal(request);
+        filterChain.doFilter(request, response);
+    }
+
+    private void doFilterInternal(HttpServletRequest request) {
 
         String authHeader = request.getHeader("Authorization");
 
         if (Objects.isNull(authHeader)) {
             logger.warn("Auth token is not present.");
-            filterChain.doFilter(request, response);
             return;
         }
 
         if (!authHeader.startsWith("Bearer ")) {
             logger.warn("Auth token does not start with Bearer string.");
-            filterChain.doFilter(request, response);
             return;
         }
 
@@ -50,7 +53,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (!jwtService.validateToken(jwtToken, userDetails)) {
             logger.warn("JWT token is invalid.");
-            filterChain.doFilter(request, response);
             return;
         }
 
@@ -59,7 +61,5 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-        filterChain.doFilter(request, response);
     }
 }
