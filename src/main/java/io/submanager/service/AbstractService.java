@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public class AbstractService<T, ID, R extends JpaRepository<T, ID>> {
 
@@ -18,6 +19,10 @@ public class AbstractService<T, ID, R extends JpaRepository<T, ID>> {
 
     public List<T> getAll() {
         return repository.findAll();
+    }
+
+    public Optional<T> get(ID id) {
+        return repository.findById(id);
     }
 
     @Transactional

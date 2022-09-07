@@ -26,14 +26,14 @@ public class SubscriptionController {
 
     @GetMapping
     public ResponseEntity<List<Subscription>> getAllSubscriptions(Principal principal) {
-        User user = getUser(principal);
+        User user = userService.getUser(principal);
         List<Subscription> subscriptions = subscriptionService.getAllByOwnerId(user.getId());
         return ResponseEntity.ok(subscriptions);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Subscription> getSubscription(Principal principal, @PathVariable Integer id) {
-        User user = getUser(principal);
+        User user = userService.getUser(principal);
         Optional<Subscription> subscription = subscriptionService.getByIdAndOwnerId(id, user.getId());
         return ResponseEntity.of(subscription);
     }
@@ -41,15 +41,9 @@ public class SubscriptionController {
     @PostMapping
     public ResponseEntity<Subscription> createSubscription(Principal principal,
                                                            @Valid @RequestBody Subscription subscription) {
-        User user = getUser(principal);
+        User user = userService.getUser(principal);
         subscription.setOwnerId(user.getId());
         Subscription createdSubscription = subscriptionService.create(subscription);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
-    }
-
-    private User getUser(Principal principal) {
-        String email = principal.getName();
-        Optional<User> user = userService.getByEmail(email);
-        return user.orElseThrow(() -> new RuntimeException("User does not exists"));
     }
 }

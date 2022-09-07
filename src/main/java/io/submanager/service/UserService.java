@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
@@ -24,5 +25,11 @@ public class UserService extends AbstractService<User, Integer, UserRepository> 
 
     public Optional<User> getByEmail(String email) {
         return repository.findByEmail(email);
+    }
+
+    public User getUser(Principal principal) {
+        String email = principal.getName();
+        Optional<User> user = getByEmail(email);
+        return user.orElseThrow(() -> new RuntimeException("User does not exists"));
     }
 }
