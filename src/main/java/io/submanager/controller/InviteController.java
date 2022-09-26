@@ -7,6 +7,7 @@ import io.submanager.model.entity.Invite;
 import io.submanager.model.entity.Subscription;
 import io.submanager.model.entity.User;
 import io.submanager.service.InviteService;
+import io.submanager.service.SubscriberService;
 import io.submanager.service.SubscriptionService;
 import io.submanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -33,6 +35,9 @@ public class InviteController {
     private SubscriptionService subscriptionService;
 
     @Autowired
+    private SubscriberService subscriberService;
+
+    @Autowired
     private InviteConverter inviteConverter;
 
     @GetMapping("/sent")
@@ -40,6 +45,7 @@ public class InviteController {
 
         User user = userService.getUser(principal);
 
+        // TODO convert return model
         List<Invite> invites = inviteService.getAllByOwnerId(user.getId());
         return ResponseEntity.ok(invites);
     }
@@ -49,6 +55,7 @@ public class InviteController {
 
         User user = userService.getUser(principal);
 
+        // TODO convert return model
         List<Invite> invites = inviteService.getAllByInviteeId(user.getId());
         return ResponseEntity.ok(invites);
     }
@@ -75,5 +82,41 @@ public class InviteController {
 
         InviteResponse inviteResponse = inviteConverter.fromInvite(createdInvite, invitee.get());
         return ResponseEntity.status(HttpStatus.CREATED).body(inviteResponse);
+    }
+
+    @Transactional
+    @PutMapping("/accept/{id}")
+    public ResponseEntity<Invite> acceptInvite(Principal principal, @PathVariable Integer id) {
+
+        User user = userService.getUser(principal);
+        Optional<Invite> invite = inviteService.getByIdAndUserId(id, user.getId());
+
+        if (invite.isEmpty()) {
+            throw new RuntimeException("Invite does not exists");
+        }
+
+        // TODO validate only PENDING
+        Invite acceptedInvite = inviteService.acceptInvite(invite.get());
+        subscriberService.create(acceptedInvite.getUserId(), acceptedInvite.getSubscriptionId());
+
+        // TODO convert return model
+        return ResponseEntity.ok(acceptedInvite);
+    }
+
+    @PutMapping("/reject/{id}")
+    public ResponseEntity<Invite> rejectInvite(Principal principal, @PathVariable Integer id) {
+
+        User user = userService.getUser(principal);
+        Optional<Invite> invite = inviteService.getByIdAndUserId(id, user.getId());
+
+        if (invite.isEmpty()) {
+            throw new RuntimeException("Invite does not exists");
+        }
+
+        // TODO validate only PENDING
+        Invite rejectedInvite = inviteService.rejectInvite(invite.get());
+
+        // TODO convert return model
+        return ResponseEntity.ok(rejectedInvite);
     }
 }
