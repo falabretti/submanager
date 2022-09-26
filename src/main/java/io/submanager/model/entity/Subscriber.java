@@ -1,5 +1,6 @@
 package io.submanager.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -17,7 +18,8 @@ public class Subscriber {
     @JoinColumn(name = "user_id", referencedColumnName = " user_id")
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "subscription_id", referencedColumnName = "subscription_id")
     private Subscription subscription;
 }

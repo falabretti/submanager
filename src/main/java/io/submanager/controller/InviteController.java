@@ -6,10 +6,7 @@ import io.submanager.model.InviteResponse;
 import io.submanager.model.entity.Invite;
 import io.submanager.model.entity.Subscription;
 import io.submanager.model.entity.User;
-import io.submanager.service.InviteService;
-import io.submanager.service.SubscriberService;
-import io.submanager.service.SubscriptionService;
-import io.submanager.service.UserService;
+import io.submanager.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +33,9 @@ public class InviteController {
 
     @Autowired
     private SubscriberService subscriberService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @Autowired
     private InviteConverter inviteConverter;
@@ -78,6 +78,9 @@ public class InviteController {
         }
 
         Invite invite = inviteConverter.fromSubscriptionAndInvitee(subscription.get(), invitee.get());
+
+        // TODO validate max slots
+        // TODO validate invite for yourself
         Invite createdInvite = inviteService.create(invite);
 
         InviteResponse inviteResponse = inviteConverter.fromInvite(createdInvite, invitee.get());
@@ -104,6 +107,7 @@ public class InviteController {
         // TODO validate only PENDING
         Invite acceptedInvite = inviteService.acceptInvite(invite.get());
         subscriberService.create(user, subscription.get());
+        paymentService.updateSubscriptionPayments(subscription.get());
 
         // TODO convert return model
         return ResponseEntity.ok(acceptedInvite);

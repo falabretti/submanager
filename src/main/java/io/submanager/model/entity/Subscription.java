@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity(name = "sm_subscription")
@@ -59,5 +60,8 @@ public class Subscription {
     @JoinColumn(name = "subscription_credential_id", referencedColumnName = "subscription_credential_id")
     @JsonProperty(access = Access.WRITE_ONLY)
     private SubscriptionCredentials subscriptionCredentials;
+
+    @OneToMany(mappedBy = "subscription")
+    private List<Subscriber> subscribers;
 }
 
