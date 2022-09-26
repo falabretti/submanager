@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/subscription")
@@ -32,17 +33,30 @@ public class SubscriptionController {
     private SubscriberService subscriberService;
 
     @GetMapping
-    public ResponseEntity<List<Subscription>> getAllSubscriptions(Principal principal) {
+    public ResponseEntity<List<Subscription>> getAllOwnedSubscriptions(Principal principal) {
         User user = userService.getUser(principal);
         List<Subscription> subscriptions = subscriptionService.getAllByOwnerId(user.getId());
         return ResponseEntity.ok(subscriptions);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Subscription> getSubscription(Principal principal, @PathVariable Integer id) {
+    public ResponseEntity<Subscription> getOwnedSubscription(Principal principal, @PathVariable Integer id) {
         User user = userService.getUser(principal);
         Optional<Subscription> subscription = subscriptionService.getByIdAndOwnerId(id, user.getId());
         return ResponseEntity.of(subscription);
+    }
+
+    @GetMapping("/subscribed")
+    public ResponseEntity<List<Subscription>> getSubscribedSubscriptions(Principal principal) {
+
+        User user = userService.getUser(principal);
+        List<Subscriber> subscribers = subscriberService.getByUserId(user.getId());
+
+        List<Subscription> subscriptions = subscribers.stream()
+                .map(Subscriber::getSubscription)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(subscriptions);
     }
 
     @PostMapping
@@ -55,7 +69,7 @@ public class SubscriptionController {
     }
 
     @GetMapping("/credential/{id}")
-    public ResponseEntity<SubscriptionCredentials> getCredential(Principal principal, @PathVariable Integer id) {
+    public ResponseEntity<SubscriptionCredentials> getCredentials(Principal principal, @PathVariable Integer id) {
 
         User user = userService.getUser(principal);
         Optional<Subscriber> subscriber = subscriberService.getByUserIdAndSubscriptionId(user.getId(), id);

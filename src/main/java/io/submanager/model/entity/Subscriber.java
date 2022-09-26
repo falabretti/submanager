@@ -13,9 +13,11 @@ public class Subscriber {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id", updatable = false)
-    private Integer userId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = " user_id")
+    private User user;
 
-    @Column(name = "subscription_id", updatable = false)
-    private Integer subscriptionId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "subscription_id", referencedColumnName = "subscription_id")
+    private Subscription subscription;
 }

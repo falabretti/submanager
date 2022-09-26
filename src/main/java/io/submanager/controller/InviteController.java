@@ -95,9 +95,15 @@ public class InviteController {
             throw new RuntimeException("Invite does not exists");
         }
 
+        Optional<Subscription> subscription = subscriptionService.get(invite.get().getSubscriptionId());
+
+        if (subscription.isEmpty()) {
+            throw new RuntimeException("Exception does not exists");
+        }
+
         // TODO validate only PENDING
         Invite acceptedInvite = inviteService.acceptInvite(invite.get());
-        subscriberService.create(acceptedInvite.getUserId(), acceptedInvite.getSubscriptionId());
+        subscriberService.create(user, subscription.get());
 
         // TODO convert return model
         return ResponseEntity.ok(acceptedInvite);
