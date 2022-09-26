@@ -9,8 +9,8 @@ import java.util.List;
 @Service
 public class InviteService extends AbstractService<Invite, Integer, InviteRepository> {
 
-    public List<Invite> getAllBySubscriptionId(Integer subscriptionId) {
-        return repository.findAllBySubscriptionId(subscriptionId);
+    public List<Invite> getAllByOwnerId(Integer userId) {
+        return repository.findAllByOwnerId(userId);
     }
 
     public List<Invite> getAllByInviteeId(Integer userId) {

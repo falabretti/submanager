@@ -35,18 +35,12 @@ public class InviteController {
     @Autowired
     private InviteConverter inviteConverter;
 
-    @GetMapping("/subscription/{subscriptionId}")
-    public ResponseEntity<List<Invite>> getSubscriptionInvites(Principal principal,
-                                                               @PathVariable Integer subscriptionId) {
+    @GetMapping("/sent")
+    public ResponseEntity<List<Invite>> getUserSentInvites(Principal principal) {
+
         User user = userService.getUser(principal);
-        Optional<Subscription> subscription = subscriptionService.getByIdAndOwnerId(subscriptionId, user.getId());
 
-        if (subscription.isEmpty()) {
-            throw new RuntimeException("Subscription does not exists");
-        }
-
-        // TODO refactor
-        List<Invite> invites = inviteService.getAllBySubscriptionId(subscriptionId);
+        List<Invite> invites = inviteService.getAllByOwnerId(user.getId());
         return ResponseEntity.ok(invites);
     }
 
@@ -55,7 +49,6 @@ public class InviteController {
 
         User user = userService.getUser(principal);
 
-        // TODO refactor
         List<Invite> invites = inviteService.getAllByInviteeId(user.getId());
         return ResponseEntity.ok(invites);
     }
