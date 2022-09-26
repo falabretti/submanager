@@ -1,5 +1,6 @@
 package io.submanager.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.submanager.converter.CredentialConverter;
 import lombok.Data;
 
@@ -11,10 +12,12 @@ import javax.validation.constraints.NotBlank;
 public class SubscriptionCredentials {
 
     @Id
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "subscription_credential_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToOne(mappedBy = "subscriptionCredentials")
     private Subscription subscription;
 

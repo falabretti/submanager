@@ -1,7 +1,11 @@
 package io.submanager.controller;
 
+import io.submanager.model.CredentialType;
+import io.submanager.model.entity.Subscriber;
 import io.submanager.model.entity.Subscription;
+import io.submanager.model.entity.SubscriptionCredentials;
 import io.submanager.model.entity.User;
+import io.submanager.service.SubscriberService;
 import io.submanager.service.SubscriptionService;
 import io.submanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,9 @@ public class SubscriptionController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SubscriberService subscriberService;
+
     @GetMapping
     public ResponseEntity<List<Subscription>> getAllSubscriptions(Principal principal) {
         User user = userService.getUser(principal);
@@ -45,5 +52,25 @@ public class SubscriptionController {
         subscription.setOwnerId(user.getId());
         Subscription createdSubscription = subscriptionService.create(subscription);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
+    }
+
+    @GetMapping("/credential/{id}")
+    public ResponseEntity<SubscriptionCredentials> getCredential(Principal principal, @PathVariable Integer id) {
+
+        User user = userService.getUser(principal);
+        Optional<Subscriber> subscriber = subscriberService.getByUserIdAndSubscriptionId(user.getId(), id);
+
+        if (subscriber.isEmpty()) {
+            throw new RuntimeException("Subscription does not exists");
+        }
+
+        Optional<Subscription> subscription = subscriptionService.get(id);
+
+        if (subscription.get().getCredentialType().equals(CredentialType.INVITE)) {
+            throw new RuntimeException("Subscription does not have credentials");
+        }
+
+        SubscriptionCredentials credentials = subscription.get().getSubscriptionCredentials();
+        return ResponseEntity.ok(credentials);
     }
 }
