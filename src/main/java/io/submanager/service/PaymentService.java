@@ -6,6 +6,7 @@ import io.submanager.model.entity.Subscriber;
 import io.submanager.model.entity.Subscription;
 import io.submanager.repository.PaymentRepository;
 import io.submanager.util.DateUtils;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,8 +19,13 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentService extends AbstractService<Payment, Integer, PaymentRepository> {
 
-    @Transactional
     public void updateSubscriptionPayments(Subscription subscription) {
+        LocalDate period = DateUtils.nowFromPeriodicity(subscription.getPeriodicity());
+        updateSubscriptionPayments(subscription, period);
+    }
+
+    @Transactional
+    public void updateSubscriptionPayments(Subscription subscription, LocalDate period) {
 
         List<Subscriber> subscribers = subscription.getSubscribers();
         BigDecimal subscriptionValue = subscription.getValue();
@@ -32,7 +38,6 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
 
         BigDecimal individualValue = subscriptionValue
                 .divide(BigDecimal.valueOf(subscriberCount + 1), 2, RoundingMode.HALF_EVEN); // +1 owner
-        LocalDate period = DateUtils.nowFromPeriodicity(subscription.getPeriodicity());
 
         List<Payment> periodPayments = getAllBySubscriptionIdAndReferencePeriod(subscription.getId(), period);
         boolean hasPaidPayment = periodPayments.stream()
