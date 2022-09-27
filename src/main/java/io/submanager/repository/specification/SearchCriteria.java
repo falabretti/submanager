@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SearchCriteria {
+public class SearchCriteria<T extends Comparable> {
 
     private String key;
     private SearchOperation operation;
-    private Object value;
+    private Comparable value;
 }

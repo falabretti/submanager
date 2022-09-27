@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -17,12 +18,14 @@ public class GenericSpecification<T> implements Specification<T> {
 
         SearchOperation operation = searchCriteria.getOperation();
 
-        Path<String> field = root.get(searchCriteria.getKey());
-        Object value = searchCriteria.getValue();
+        Path<Comparable> field = root.get(searchCriteria.getKey());
+        Comparable value = searchCriteria.getValue();
 
         switch (operation) {
             case EQUALS:
                 return criteriaBuilder.equal(field, value);
+            case LESS_OR_EQUAL:
+                return criteriaBuilder.lessThanOrEqualTo(field, value);
             default:
                 return null;
         }

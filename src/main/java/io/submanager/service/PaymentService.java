@@ -6,6 +6,7 @@ import io.submanager.model.entity.Subscriber;
 import io.submanager.model.entity.Subscription;
 import io.submanager.repository.PaymentRepository;
 import io.submanager.util.DateUtils;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -48,7 +49,8 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
             subscribers.forEach(sub -> createPayment(sub, individualValue, period));
         } else if (!hasPaidPayment) {
             List<Integer> subscribersWithPaymentIds = periodPayments.stream()
-                    .map(Payment::getSubscriberId)
+                    .map(Payment::getSubscriber)
+                    .map(Subscriber::getId)
                     .collect(Collectors.toList());
 
             List<Subscriber> subscribersWithoutPayment = subscribers.stream()
@@ -68,7 +70,7 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
         Subscription subscription = subscriber.getSubscription();
 
         Payment payment = new Payment();
-        payment.setSubscriberId(subscriber.getId());
+        payment.setSubscriber(subscriber);
         payment.setPeriodicity(subscription.getPeriodicity());
         payment.setValue(value);
         payment.setReferencePeriod(period);
@@ -84,5 +86,9 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
 
     public Optional<Payment> getByIdAndOwnerId(Integer paymentId, Integer ownerId) {
         return repository.findByIdAndOwnerId(paymentId, ownerId);
+    }
+
+    public List<Payment> getAll(Specification specification) {
+        return repository.findAll(specification);
     }
 }

@@ -33,6 +33,12 @@ public class AbstractService<T, ID, R extends JpaRepository<T, ID>> {
     }
 
     @Transactional
+    public List<T> createAll(Iterable<T> entities) {
+        List<T> savedEntities = repository.saveAll(entities);
+        return savedEntities;
+    }
+
+    @Transactional
     public T update(T entity) {
         T updatedEntity = repository.saveAndFlush(entity);
 //        entityManager.refresh(updatedEntity);

@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity(name = "sm_payment")
@@ -17,8 +18,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "subscriber_id")
-    private Integer subscriberId;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "subscriber_id", referencedColumnName = "subscriber_id")
+    private Subscriber subscriber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "periodicity")
@@ -36,4 +38,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private PaymentStatus status;
+
+    @OneToMany(mappedBy = "payment")
+    private List<PaymentNotification> paymentNotifications;
 }
