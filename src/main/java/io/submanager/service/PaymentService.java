@@ -6,7 +6,6 @@ import io.submanager.model.entity.Subscriber;
 import io.submanager.model.entity.Subscription;
 import io.submanager.repository.PaymentRepository;
 import io.submanager.util.DateUtils;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -14,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,5 +80,9 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
 
     public List<Payment> getAllBySubscriptionIdAndReferencePeriod(Integer subscriptionId, LocalDate period) {
         return repository.findAllBySubscriptionIdAndReferencePeriod(subscriptionId, period);
+    }
+
+    public Optional<Payment> getByIdAndOwnerId(Integer paymentId, Integer ownerId) {
+        return repository.findByIdAndOwnerId(paymentId, ownerId);
     }
 }
