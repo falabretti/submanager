@@ -23,4 +23,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Integer>, JpaS
             "AND pay.payment_id = :paymentId " +
             "AND subpn.owner_id = :ownerId", nativeQuery = true)
     public Optional<Payment> findByIdAndOwnerId(Integer paymentId, Integer ownerId);
+
+    @Query(value = "SELECT pay.* FROM sm_payment pay, sm_subscriber sub " +
+            "WHERE pay.subscriber_id = sub.subscriber_id " +
+            "AND pay.status = 'PENDING'" +
+            "AND sub.user_id = :userId", nativeQuery = true)
+    public List<Payment> findAllDueBySubscriberUserId(Integer userId);
 }
