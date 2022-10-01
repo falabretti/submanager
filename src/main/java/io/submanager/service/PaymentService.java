@@ -6,6 +6,7 @@ import io.submanager.model.entity.Subscriber;
 import io.submanager.model.entity.Subscription;
 import io.submanager.repository.PaymentRepository;
 import io.submanager.util.DateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class PaymentService extends AbstractService<Payment, Integer, PaymentRepository> {
+
+    @Autowired
+    private PaymentNotificationService paymentNotificationService;
 
     public void updateSubscriptionPayments(Subscription subscription) {
         LocalDate period = DateUtils.nowFromPeriodicity(subscription.getPeriodicity());
@@ -98,5 +102,17 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
 
     public List<Payment> getAllDueByOwnerId(Integer userId) {
         return repository.findAllDueByOwnerUserId(userId);
+    }
+
+    @Transactional
+    public Payment updatePaymentStatus(Payment payment, PaymentStatus status) {
+        payment.setStatus(status);
+        Payment updatedPayment = update(payment);
+
+        if (status.equals(PaymentStatus.PAID)) {
+            paymentNotificationService.removePaymentNotifications(payment);
+        }
+
+        return updatedPayment;
     }
 }

@@ -43,17 +43,14 @@ public class PaymentController {
     public ResponseEntity<Payment> updatePayment(Principal principal, @RequestBody UpdatePaymentRequest request) {
 
         User user = userService.getUser(principal);
-        Optional<Payment> maybePayment = paymentService.getByIdAndOwnerId(request.getPaymentId(), user.getId());
+        Optional<Payment> payment = paymentService.getByIdAndOwnerId(request.getPaymentId(), user.getId());
 
-        if (maybePayment.isEmpty()) {
+        if (payment.isEmpty()) {
             // TODO defined exceptions
             throw new RuntimeException("Payment does not exists");
         }
 
-        Payment payment = maybePayment.get();
-        payment.setStatus(request.getStatus());
-        Payment updatedPayment = paymentService.update(payment);
-
+        Payment updatedPayment = paymentService.updatePaymentStatus(payment.get(), request.getStatus());
         return ResponseEntity.ok(updatedPayment);
     }
 

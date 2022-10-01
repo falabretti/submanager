@@ -17,7 +17,7 @@ public class PaymentNotification {
     @Column(name = "user_id")
     private Integer userId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "payment_id", referencedColumnName = "payment_id")
     private Payment payment;
 
