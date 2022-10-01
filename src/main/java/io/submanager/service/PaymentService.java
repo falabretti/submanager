@@ -95,4 +95,8 @@ public class PaymentService extends AbstractService<Payment, Integer, PaymentRep
     public List<Payment> getAllDueBySubscriberUserId(Integer userId) {
         return repository.findAllDueBySubscriberUserId(userId);
     }
+
+    public List<Payment> getAllDueByOwnerId(Integer userId) {
+        return repository.findAllDueByOwnerUserId(userId);
+    }
 }

@@ -52,15 +52,25 @@ public class PaymentController {
 
         Payment payment = maybePayment.get();
         payment.setStatus(request.getStatus());
-        payment = paymentService.update(payment);
+        Payment updatedPayment = paymentService.update(payment);
 
-        return ResponseEntity.ok(payment);
+        return ResponseEntity.ok(updatedPayment);
     }
 
-    @GetMapping
+    @GetMapping("/pay")
     public ResponseEntity<List<PaymentResponse>> getDuePayments(Principal principal) {
         User user = userService.getUser(principal);
         List<Payment> payments = paymentService.getAllDueBySubscriberUserId(user.getId());
+        List<PaymentResponse> paymentResponses = payments.stream()
+                .map(paymentConverter::fromPayment)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(paymentResponses);
+    }
+
+    @GetMapping("/receive")
+    public ResponseEntity<List<PaymentResponse>> getPaymentsToReceive(Principal principal) {
+        User user = userService.getUser(principal);
+        List<Payment> payments = paymentService.getAllDueByOwnerId(user.getId());
         List<PaymentResponse> paymentResponses = payments.stream()
                 .map(paymentConverter::fromPayment)
                 .collect(Collectors.toList());
