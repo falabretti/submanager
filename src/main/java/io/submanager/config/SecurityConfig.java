@@ -31,6 +31,9 @@ public class SecurityConfig {
     private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
+    private AuthenticationExceptionHandler authenticationExceptionHandler;
+
+    @Autowired
     void configure(AuthenticationManagerBuilder builder) throws Exception {
         builder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
@@ -48,6 +51,7 @@ public class SecurityConfig {
         httpSecurity.authorizeRequests().antMatchers("/auth/**").permitAll();
         httpSecurity.authorizeRequests().anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.httpBasic().authenticationEntryPoint(authenticationExceptionHandler);
 
         return httpSecurity.build();
     }

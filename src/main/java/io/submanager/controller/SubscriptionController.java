@@ -1,5 +1,6 @@
 package io.submanager.controller;
 
+import io.submanager.exception.ClientException;
 import io.submanager.model.CredentialType;
 import io.submanager.model.entity.Subscriber;
 import io.submanager.model.entity.Subscription;
@@ -75,13 +76,13 @@ public class SubscriptionController {
         Optional<Subscriber> subscriber = subscriberService.getByUserIdAndSubscriptionId(user.getId(), id);
 
         if (subscriber.isEmpty()) {
-            throw new RuntimeException("Subscription does not exists");
+            throw new ClientException("Subscription does not exists");
         }
 
         Optional<Subscription> subscription = subscriptionService.get(id);
 
         if (subscription.get().getCredentialType().equals(CredentialType.INVITE)) {
-            throw new RuntimeException("Subscription does not have credentials");
+            throw new ClientException("Subscription does not have credentials");
         }
 
         SubscriptionCredentials credentials = subscription.get().getSubscriptionCredentials();

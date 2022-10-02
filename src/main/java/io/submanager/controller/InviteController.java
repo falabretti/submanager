@@ -1,6 +1,7 @@
 package io.submanager.controller;
 
 import io.submanager.converter.InviteConverter;
+import io.submanager.exception.ClientException;
 import io.submanager.model.CreateInviteRequest;
 import io.submanager.model.InviteResponse;
 import io.submanager.model.entity.Invite;
@@ -68,13 +69,13 @@ public class InviteController {
                 .getByIdAndOwnerId(inviteRequest.getSubscriptionId(), user.getId());
 
         if (subscription.isEmpty()) {
-            throw new RuntimeException("Subscription does not exists");
+            throw new ClientException("Subscription does not exists");
         }
 
         Optional<User> invitee = userService.getByEmail(inviteRequest.getEmail());
 
         if (invitee.isEmpty()) {
-            throw new RuntimeException("Invitee with this email does not exists");
+            throw new ClientException("Invitee with this email does not exists");
         }
 
         Invite invite = inviteConverter.fromSubscriptionAndInvitee(subscription.get(), invitee.get());
@@ -95,13 +96,13 @@ public class InviteController {
         Optional<Invite> invite = inviteService.getByIdAndUserId(id, user.getId());
 
         if (invite.isEmpty()) {
-            throw new RuntimeException("Invite does not exists");
+            throw new ClientException("Invite does not exists");
         }
 
         Optional<Subscription> subscription = subscriptionService.get(invite.get().getSubscriptionId());
 
         if (subscription.isEmpty()) {
-            throw new RuntimeException("Exception does not exists");
+            throw new ClientException("Subscription does not exists");
         }
 
         // TODO validate only PENDING
@@ -120,7 +121,7 @@ public class InviteController {
         Optional<Invite> invite = inviteService.getByIdAndUserId(id, user.getId());
 
         if (invite.isEmpty()) {
-            throw new RuntimeException("Invite does not exists");
+            throw new ClientException("Invite does not exists");
         }
 
         // TODO validate only PENDING

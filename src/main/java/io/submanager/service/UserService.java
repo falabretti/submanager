@@ -1,5 +1,6 @@
 package io.submanager.service;
 
+import io.submanager.exception.ClientException;
 import io.submanager.model.entity.User;
 import io.submanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,6 @@ public class UserService extends AbstractService<User, Integer, UserRepository> 
     public User getUser(Principal principal) {
         String email = principal.getName();
         Optional<User> user = getByEmail(email);
-        return user.orElseThrow(() -> new RuntimeException("User does not exists"));
+        return user.orElseThrow(() -> new ClientException("User does not exists"));
     }
 }

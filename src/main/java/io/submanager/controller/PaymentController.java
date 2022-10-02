@@ -2,6 +2,7 @@ package io.submanager.controller;
 
 import io.submanager.converter.PaymentConverter;
 import io.submanager.converter.PaymentNotificationConverter;
+import io.submanager.exception.ClientException;
 import io.submanager.model.PaymentNotificationResponse;
 import io.submanager.model.PaymentResponse;
 import io.submanager.model.UpdatePaymentRequest;
@@ -46,8 +47,7 @@ public class PaymentController {
         Optional<Payment> payment = paymentService.getByIdAndOwnerId(request.getPaymentId(), user.getId());
 
         if (payment.isEmpty()) {
-            // TODO defined exceptions
-            throw new RuntimeException("Payment does not exists");
+            throw new ClientException("Payment does not exists");
         }
 
         Payment updatedPayment = paymentService.updatePaymentStatus(payment.get(), request.getStatus());
