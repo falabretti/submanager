@@ -30,7 +30,6 @@ public class InviteConverter {
         inviteResponse.setEmail(invitee.getEmail());
         inviteResponse.setStatus(invite.getStatus());
 
-        // TODO add subscription name
         return inviteResponse;
     }
 

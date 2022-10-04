@@ -46,7 +46,6 @@ public class InviteController {
 
         User user = userService.getUser(principal);
 
-        // TODO convert return model
         List<Invite> invites = inviteService.getAllByOwnerId(user.getId());
         return ResponseEntity.ok(invites);
     }
@@ -56,7 +55,6 @@ public class InviteController {
 
         User user = userService.getUser(principal);
 
-        // TODO convert return model
         List<Invite> invites = inviteService.getAllByInviteeId(user.getId());
         return ResponseEntity.ok(invites);
     }
@@ -78,13 +76,14 @@ public class InviteController {
             throw new ClientException("Invitee with this email does not exists");
         }
 
+        if (user.getId() == invitee.get().getId()) {
+            throw new ClientException("Cannot create a invite for yourself");
+        }
+
         Invite invite = inviteConverter.fromSubscriptionAndInvitee(subscription.get(), invitee.get());
-
-        // TODO validate max slots
-        // TODO validate invite for yourself
-        Invite createdInvite = inviteService.create(invite);
-
+        Invite createdInvite = inviteService.create(invite, subscription.get());
         InviteResponse inviteResponse = inviteConverter.fromInvite(createdInvite, invitee.get());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(inviteResponse);
     }
 
@@ -105,12 +104,10 @@ public class InviteController {
             throw new ClientException("Subscription does not exists");
         }
 
-        // TODO validate only PENDING
-        Invite acceptedInvite = inviteService.acceptInvite(invite.get());
+        Invite acceptedInvite = inviteService.acceptInvite(invite.get(), subscription.get());
         subscriberService.create(user, subscription.get());
         paymentService.updateSubscriptionPayments(subscription.get());
 
-        // TODO convert return model
         return ResponseEntity.ok(acceptedInvite);
     }
 
@@ -124,10 +121,8 @@ public class InviteController {
             throw new ClientException("Invite does not exists");
         }
 
-        // TODO validate only PENDING
         Invite rejectedInvite = inviteService.rejectInvite(invite.get());
 
-        // TODO convert return model
         return ResponseEntity.ok(rejectedInvite);
     }
 }
