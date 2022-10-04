@@ -1,5 +1,6 @@
 package io.submanager.converter;
 
+import io.submanager.exception.ClientException;
 import io.submanager.model.CreateInviteRequest;
 import io.submanager.model.InviteResponse;
 import io.submanager.model.entity.Invite;
@@ -23,10 +24,21 @@ public class InviteConverter {
 
     public InviteResponse fromInvite(Invite invite, User invitee) {
 
+        Optional<Subscription> subscription = subscriptionService.get(invite.getSubscriptionId());
+        if (subscription.isEmpty()) {
+            throw new ClientException("Subscription does not exists");
+        }
+
+        Optional<User> user = userService.get(subscription.get().getOwnerId());
+        if (subscription.isEmpty()) {
+            throw new ClientException("User does not exists");
+        }
+
         InviteResponse inviteResponse = new InviteResponse();
 
         inviteResponse.setId(invite.getId());
-        inviteResponse.setSubscriptionId(invite.getSubscriptionId());
+        inviteResponse.setSubscription(subscription.get());
+        inviteResponse.setOwnerEmail(user.get().getEmail());
         inviteResponse.setEmail(invitee.getEmail());
         inviteResponse.setStatus(invite.getStatus());
 

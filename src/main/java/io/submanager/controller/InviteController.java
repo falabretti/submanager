@@ -4,6 +4,7 @@ import io.submanager.converter.InviteConverter;
 import io.submanager.exception.ClientException;
 import io.submanager.model.CreateInviteRequest;
 import io.submanager.model.InviteResponse;
+import io.submanager.model.InviteStatus;
 import io.submanager.model.entity.Invite;
 import io.submanager.model.entity.Subscription;
 import io.submanager.model.entity.User;
@@ -18,6 +19,7 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/invite")
@@ -42,21 +44,27 @@ public class InviteController {
     private InviteConverter inviteConverter;
 
     @GetMapping("/sent")
-    public ResponseEntity<List<Invite>> getUserSentInvites(Principal principal) {
+    public ResponseEntity<List<InviteResponse>> getUserSentInvites(Principal principal) {
 
         User user = userService.getUser(principal);
 
         List<Invite> invites = inviteService.getAllByOwnerId(user.getId());
-        return ResponseEntity.ok(invites);
+        List<InviteResponse> inviteResponses = invites.stream()
+                .map(inv -> inviteConverter.fromInvite(inv, userService.get(inv.getUserId()).get()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(inviteResponses);
     }
 
     @GetMapping("/received")
-    public ResponseEntity<List<Invite>> getUserReceivedInvites(Principal principal) {
+    public ResponseEntity<List<InviteResponse>> getUserReceivedInvites(Principal principal) {
 
         User user = userService.getUser(principal);
 
         List<Invite> invites = inviteService.getAllByInviteeId(user.getId());
-        return ResponseEntity.ok(invites);
+        List<InviteResponse> inviteResponses = invites.stream()
+                .map(inv -> inviteConverter.fromInvite(inv, user))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(inviteResponses);
     }
 
     @PostMapping
@@ -96,6 +104,10 @@ public class InviteController {
 
         if (invite.isEmpty()) {
             throw new ClientException("Invite does not exists");
+        }
+
+        if (!invite.get().getStatus().equals(InviteStatus.PENDING)) {
+            throw new ClientException("Invite already accepted or rejected");
         }
 
         Optional<Subscription> subscription = subscriptionService.get(invite.get().getSubscriptionId());
