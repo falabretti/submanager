@@ -13,6 +13,7 @@ public class PaymentConverter {
 
         paymentResponse.setId(payment.getId());
         paymentResponse.setSubscription(payment.getSubscriber().getSubscription());
+        paymentResponse.setSubscriber(payment.getSubscriber());
         paymentResponse.setValue(payment.getValue());
         paymentResponse.setPeriodicity(payment.getPeriodicity());
         paymentResponse.setReferencePeriod(payment.getReferencePeriod());
